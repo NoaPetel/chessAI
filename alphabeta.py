@@ -1,27 +1,51 @@
-import eval 
+import eval
 import chess
 
-def alphabeta(board, alpha, beta):
-    if(board.is_game_over()):
-        return eval.run(board)
-    else:
-        if(board.turn == chess.WHITE):
+MAX_DEPTH = 4
+
+class AlphaBeta:
+    def __init__(self, side, depth=MAX_DEPTH):
+        self.side = side
+        self.depth = depth
+        
+    def run(self, board, depth=None, alpha=float('-inf'), beta=float('inf')):
+        if depth is None:
+            depth = self.depth
+            
+        if board.is_game_over() or depth == 0:
+            v = eval.run(board)
+            return v, None
+            
+        best_move = None
+        if board.turn != self.side:  # Minimizing player
             v = float('inf')
-            for move in board.legal_move:
-                nextBoard = board.push_san(move)
-                v = min(v, alphabeta(nextBoard, alpha, beta))
-                if(alpha >= v):
-                    return v
-                beta = min(beta, v)
-        else:
-            v = float('-inf')
-            for move in board.legal_move:
+            for move in board.legal_moves:
+                board.push_uci(move.uci())
+                score, _ = self.run(board, depth - 1, alpha, beta)
+                board.pop()
                 
-                nextBoard = board.push_san(move)
-                v = max(v, alphabeta(nextBoard, alpha, beta))
-                if(v >= beta):
-                    return v
+                if score < v:
+                    v = score
+                    best_move = move
+                    
+                if v <= alpha:  # Pruning condition for minimizing player
+                    return v, best_move
+                    
+                beta = min(beta, v)
+        else:  # Maximizing player
+            v = float('-inf')
+            for move in board.legal_moves:
+                board.push_uci(move.uci())
+                score, _ = self.run(board, depth - 1, alpha, beta)
+                board.pop()
+                
+                if score > v:
+                    v = score
+                    best_move = move
+                    
+                if v >= beta:  # Pruning condition for maximizing player
+                    return v, best_move
+                    
                 alpha = max(alpha, v)
-    return v
-            
-            
+                
+        return v, best_move
