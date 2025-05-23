@@ -13,7 +13,7 @@ class AlphaBeta:
             depth = self.depth
             
         if board.is_game_over() or depth == 0:
-            v = eval.run(board)
+            v = eval.run(board, self.side)
             return v, None
             
         best_move = None
@@ -47,5 +47,5 @@ class AlphaBeta:
                     return v, best_move
                     
                 alpha = max(alpha, v)
-                
+           
         return v, best_move

@@ -1,11 +1,11 @@
 import chess
 from tables import mg_bishop_table, mg_king_table, mg_knight_table, mg_pawn_table, mg_queen_table, mg_rook_table, eg_bishop_table, eg_king_table, eg_knight_table, eg_pawn_table, eg_queen_table, eg_rook_table
 
-def run(board):
+def run(board, side):
     pestoResult = evaluate_pesto(board)
     pieceCountResult = evaluate_material(board) 
     checkmateResulst = evaluate_checkmate(board)
-    return pestoResult + pieceCountResult + checkmateResulst
+    return (pestoResult + pieceCountResult + checkmateResulst) * (1 if side == chess.WHITE else -1)
 
 def evaluate_checkmate(board):
     if board.is_checkmate():
